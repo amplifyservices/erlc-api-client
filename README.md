@@ -148,5 +148,13 @@ try {
 import ERLCClient from 'erlc-api-client';
 
 const client = new ERLCClient({ API_KEY: 'key' });
+```
+
+## License  
+This project is licensed under the [ERLC API Client License](LICENSE.md)  
+(GPL-3.0 with additional restrictions). By using this software, you agree to:  
+- Not redistribute modified versions publicly  
+- Comply with Roblox/PRC Terms of Service  
+- Provide clear attribution  
 // Full type checking available
 ```
