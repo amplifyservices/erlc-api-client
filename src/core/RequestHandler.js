@@ -1,59 +1,36 @@
-const axios = require('axios');
 const { AsyncQueue } = require('@sapphire/async-queue');
-const { APIError, RateLimitError } = require('../utils/errors');
+const axios = require('axios');
 
 class RequestHandler {
-  constructor(apiKey, options) {
-    this.apiKey = apiKey;
-    this.baseURL = options.baseURL || 'https://api.policeroleplay.community/v1';
-    this.rateLimiter = options.rateLimiter;
+  constructor(rateLimiter, options) {
+    this.rateLimiter = rateLimiter;
     this.queue = new AsyncQueue();
-    this.maxRetries = options.maxRetries || 3;
+    this.options = options;
   }
 
-  async execute(endpoint, method = 'GET', data, retryCount = 0) {
+  async execute(endpoint, method = 'GET', data) {
     await this.queue.wait();
-    
     try {
-      const bucketWait = this.rateLimiter.checkLimit(endpoint);
-      if (bucketWait > 0) {
-        await new Promise(resolve => setTimeout(resolve, bucketWait));
+      const bucket = endpoint.split('/')[1] || 'global';
+      const delay = this.rateLimiter.checkLimit(bucket);
+      
+      if (delay > 0) {
+        await new Promise(resolve => setTimeout(resolve, delay));
       }
 
-      const config = {
+      const response = await axios({
         method,
-        url: `${this.baseURL}${endpoint}`,
+        url: `${this.options.baseURL || 'https://api.policeroleplay.community/v1'}${endpoint}`,
         headers: {
-          'Server-Key': this.apiKey,
+          'Server-Key': this.options.apiKey,
           'Content-Type': 'application/json'
         },
+        data,
         validateStatus: () => true
-      };
+      });
 
-      if (data) config.data = data;
-
-      this.emit('request', { endpoint, method });
-      const response = await axios(config);
-
-      const bucket = response.headers['x-ratelimit-bucket'] || 'global';
-      this.rateLimiter.update(bucket, response.headers);
-
-      if (response.status === 429) {
-        throw new RateLimitError(response);
-      }
-
-      if (response.status >= 400) {
-        throw new APIError(response);
-      }
-
-      return response.data;
-    } catch (error) {
-      if (error instanceof RateLimitError && retryCount < this.maxRetries) {
-        this.emit('retry', { endpoint, retryCount });
-        await new Promise(resolve => setTimeout(resolve, error.retryAfter));
-        return this.execute(endpoint, method, data, retryCount + 1);
-      }
-      throw error;
+      this.rateLimiter.updateLimits(response.headers, bucket);
+      return response;
     } finally {
       this.queue.shift();
     }
