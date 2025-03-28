@@ -1,9 +1,8 @@
 declare module 'erlc-api-client' {
   interface ERLCClientConfig {
-    API_KEY: string;
-    baseURL?: string;
+    SERVER_KEY: string;
+    GLOBAL_KEY?: string;
     enableLogging?: boolean;
-    globalRateDelay?: number;
   }
 
   interface ServerInfo {
