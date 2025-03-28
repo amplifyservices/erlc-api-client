@@ -96,7 +96,6 @@ await client.commands.send(':ban RuleBreaker123');
 | `:respawn`           | `<player>`                    | Respawn player                       | `:respawn Player`           |
 | `:load`              | `<player>`                    | Load player character                | `:load Player`              |
 | `:tp`, `:teleport`   | `<player1> <player2>`         | Teleport player to player            | `:tp Player1 Player2`       |
-| `:to`                | -                             | Teleport to admin position           | `:to`                       |
 | `:startfire`         | `house/brush/building`        | Start fire at location               | `:startfire house`          |
 | `:stopfire`          | -                             | Extinguish all fires                 | `:stopfire`                 |
 | `:prty`, `:priority` | `<seconds>`                   | Set priority timer                   | `:prty 300`                 |
