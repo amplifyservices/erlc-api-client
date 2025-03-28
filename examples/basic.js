@@ -1,24 +1,23 @@
-const ERLCClient = require('../src/core/Client');
-
-const client = new ERLCClient('YOUR_API_KEY_HERE');
+const ERLCClient = require('../src/Client');
 
 async function main() {
+  const client = new ERLCClient({
+    API_KEY: 'your_api_key_here',
+    enableLogging: true
+  });
+
   try {
-    const serverInfo = await client.server.getInfo();
-    console.log('📡 Server Status:');
-    console.log(`- Name: ${serverInfo.Name}`);
-    console.log(`- Players: ${serverInfo.CurrentPlayers}/${serverInfo.MaxPlayers}`);
-    console.log(`- Verified Required: ${serverInfo.AccVerifiedReq}`);
-
-    const players = await client.server.getPlayers();
-    console.log('\n🎮 Online Players:');
-    players.forEach(player => {
-      console.log(`- ${player.Player} (${player.Team})`);
-    });
-
-    await client.commands.send(':h This is an automated message!');
-    console.log('\n📢 Sent server notification');
-
+    await client.connect();
+    
+    const [info, players] = await Promise.all([
+      client.server.getInfo(),
+      client.server.getPlayers()
+    ]);
+    
+    console.log(`🚓 Officers Online: ${players.filter(p => p.Team === 'Police').length}`);
+    
+    await client.commands.send(':h Balance out the teams!');
+    
   } catch (error) {
     console.error('❌ Error:', error.message);
   }
