@@ -1,21 +1,14 @@
-const BaseEndpoint = require('./BaseEndpoint');
-const { ValidationError } = require('../utils/errors');
+class Commands {
+  constructor(requestHandler) {
+    this.request = requestHandler;
+  }
 
-class CommandsEndpoint extends BaseEndpoint {
-  async execute(command) {
+  async send(command) {
     if (!command.startsWith(':')) {
-      throw new ValidationError('Commands must start with a colon (:)');
+      throw new Error('Command must start with colon (e.g. ":h Hello")');
     }
-    return this.client.execute('/server/command', 'POST', { command });
-  }
-
-  async broadcast(message) {
-    return this.execute(`:h ${message}`);
-  }
-
-  async announce(message) {
-    return this.execute(`:announce ${message}`);
+    return (await this.request.execute('/server/command', 'POST', { command })).data;
   }
 }
 
-module.exports = CommandsEndpoint;
+module.exports = Commands;
