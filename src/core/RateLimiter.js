@@ -1,33 +1,23 @@
 class RateLimiter {
-  constructor(options = {}) {
+  constructor() {
     this.buckets = new Map();
-    this.globalDelay = options.globalRateDelay || 1714;
-    this.lastRequest = 0;
-    this.bucketResetBuffer = options.bucketResetBuffer || 1000;
   }
 
-  checkLimit(bucket) {
-    const now = Date.now();
-    const bucketData = this.buckets.get(bucket) || {
-      remaining: 1,
-      limit: 35,
-      reset: now + 60000
-    };
+  updateFromHeaders(endpoint, headers) {
+    const bucket = headers['x-ratelimit-bucket'] || 'global';
+    this.buckets.set(bucket, {
+      remaining: parseInt(headers['x-ratelimit-remaining']),
+      limit: parseInt(headers['x-ratelimit-limit']),
+      reset: parseInt(headers['x-ratelimit-reset']) * 1000
+    });
+  }
 
-    if (bucketData.remaining <= 0 && now < bucketData.reset + this.bucketResetBuffer) {
-      return bucketData.reset - now + this.bucketResetBuffer;
+  async checkLimits(endpoint) {
+    const bucket = this.buckets.get(endpoint) || this.buckets.get('global');
+    if (bucket && bucket.remaining <= 0) {
+      const waitTime = bucket.reset - Date.now() + 1000;
+      await new Promise(resolve => setTimeout(resolve, waitTime));
     }
-    return 0;
-  }
-
-  updateLimits(headers, bucket) {
-    const newData = {
-      remaining: parseInt(headers['x-ratelimit-remaining'], 10),
-      limit: parseInt(headers['x-ratelimit-limit'], 10),
-      reset: parseInt(headers['x-ratelimit-reset'], 10) * 1000
-    };
-    this.buckets.set(bucket, newData);
-    this.lastRequest = Date.now();
   }
 }
 
