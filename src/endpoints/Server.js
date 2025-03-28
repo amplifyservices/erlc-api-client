@@ -1,23 +1,19 @@
-const BaseEndpoint = require('./BaseEndpoint');
+class Server {
+  constructor(requestHandler) {
+    this.request = requestHandler;
+  }
 
-class ServerEndpoint extends BaseEndpoint {
   async getInfo() {
-    return this.client.execute('/server');
+    return (await this.request.execute('/server')).data;
   }
 
   async getQueue() {
-    return this.client.execute('/server/queue');
+    return (await this.request.execute('/server/queue')).data;
   }
 
-  async getStatus() {
-    const info = await this.getInfo();
-    return {
-      online: info.online,
-      players: info.players,
-      maxPlayers: info.maxPlayers,
-      map: info.map
-    };
+  async getVehicles() {
+    return (await this.request.execute('/server/vehicles')).data;
   }
 }
 
-module.exports = ServerEndpoint;
+module.exports = Server;
