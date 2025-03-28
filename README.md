@@ -10,6 +10,34 @@ Enterprise-grade Node.js client for the Emergency Response: Liberty City API wit
 ```bash
 npm install erlc-api-client
 ```
+
+## Authentication
+
+```javascript
+const client = new ERLCClient({
+  SERVER_KEY: 'your_server_key', // Required
+  GLOBAL_KEY: 'optional_global_key' // For increased rate limits
+});
+```
+
+## Rate Limits
+Rate Limits
+The API enforces strict rate limits:
+Standard: 35 requests/minute (with SERVER_KEY only)
+Increased: I don't really know about the global key, but if you are a part of the program, you would know. (with GLOBAL_KEY)
+Always respect the x-ratelimit-* headers
+```js
+const client = new ERLCClient({
+  SERVER_KEY: 'your_key',
+  GLOBAL_KEY: 'your_global_key'
+});
+
+client.connect()
+  .then(info => {
+    console.log(`Connected to ${info.Name}.`);
+  });
+```
+
 ## Basic Usage
 ```js
 const ERLCClient = require('erlc-api-client');
