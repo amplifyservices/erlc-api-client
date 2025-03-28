@@ -1,30 +1,20 @@
 const { RateLimiter } = require('./RateLimiter');
 const { RequestHandler } = require('./RequestHandler');
-const EventEmitter = require('events');
+const Server = require('../endpoints/Server');
+const Players = require('../endpoints/Players');
+const Commands = require('../endpoints/Commands');
 
-class ERLCClient extends EventEmitter {
+class ERLCClient {
   constructor(apiKey, options = {}) {
-    super();
     this.apiKey = apiKey;
-    this.version = '2.1.0';
+    this.options = options;
     
     this.rateLimiter = new RateLimiter(options);
-    this.requestHandler = new RequestHandler(this.apiKey, {
-      ...options,
-      rateLimiter: this.rateLimiter
-    });
-
-    this.requestHandler.on('request', (data) => this.emit('request', data));
-    this.requestHandler.on('retry', (data) => this.emit('retry', data));
-    this.rateLimiter.on('rateLimit', (data) => this.emit('rateLimit', data));
-  }
-
-  async execute(endpoint, method = 'GET', data) {
-    return this.requestHandler.execute(endpoint, method, data);
-  }
-
-  getRateLimitStats() {
-    return this.rateLimiter.getStats();
+    this.requestHandler = new RequestHandler(this.rateLimiter, options);
+    
+    this.server = new Server(this.requestHandler);
+    this.players = new Players(this.requestHandler);
+    this.commands = new Commands(this.requestHandler);
   }
 }
 
