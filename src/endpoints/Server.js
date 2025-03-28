@@ -1,14 +1,14 @@
-class Server {
-  constructor(requestHandler) {
-    this.request = requestHandler;
+class ServerEndpoint {
+  constructor(client) {
+    this.client = client;
   }
 
   async getInfo() {
-    return (await this.request.execute('/server')).data;
+    return (await this.client._request('GET', '/server')).data;
   }
 
   async getPlayers() {
-    return (await this.request.execute('/server/players')).data;
+    return (await this.client._request('GET', '/server/players')).data;
   }
 
   async getQueue() {
@@ -40,4 +40,4 @@ class Server {
   }
 }
 
-module.exports = Server;
+module.exports = ServerEndpoint;
