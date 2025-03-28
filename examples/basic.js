@@ -1,22 +1,26 @@
 const ERLCClient = require('../src/core/Client');
 
-const client = new ERLCClient('YOUR_API_KEY');
+const client = new ERLCClient('YOUR_API_KEY_HERE');
 
 async function main() {
   try {
     const serverInfo = await client.server.getInfo();
+    console.log('📡 Server Status:');
+    console.log(`- Name: ${serverInfo.Name}`);
+    console.log(`- Players: ${serverInfo.CurrentPlayers}/${serverInfo.MaxPlayers}`);
+    console.log(`- Verified Required: ${serverInfo.AccVerifiedReq}`);
+
     const players = await client.server.getPlayers();
-    const bans = await client.server.getBans();
-    const modCalls = await client.server.getModCalls();
+    console.log('\n🎮 Online Players:');
+    players.forEach(player => {
+      console.log(`- ${player.Player} (${player.Team})`);
+    });
 
-    console.log('Server Status:', serverInfo.status);
-    console.log('Online Players:', players.length);
-    console.log('Active Bans:', Object.keys(bans).length);
-    console.log('Recent Mod Calls:', modCalls.length);
+    await client.commands.send(':h This is an automated message!');
+    console.log('\n📢 Sent server notification');
 
-    await client.commands.send(':h Server restart in 5 minutes!');
   } catch (error) {
-    console.error('Error:', error.message);
+    console.error('❌ Error:', error.message);
   }
 }
 
