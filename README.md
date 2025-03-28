@@ -14,112 +14,112 @@ npm install erlc-api-client
 ```js
 const ERLCClient = require('erlc-api-client');
 
-// Initialize with your API key
-const client = new ERLCClient('YOUR_API_KEY_HERE');
+// Initialize client
+const client = new ERLCClient({
+  API_KEY: 'your_server_key_here'
+});
 
-async function monitorServer() {
-  try {
-    // Get server information
-    const serverInfo = await client.server.getInfo();
-    console.log(`Server Name: ${serverInfo.Name}`);
-    console.log(`Players Online: ${serverInfo.CurrentPlayers}`);
-
-    // Send server message
-    await client.commands.send(':h Session shutdown in 10 minutes');
-    console.log('Sent server notification');
-
-  } catch (error) {
-    console.error('Operation failed:', error.message);
-  }
-}
-
-monitorServer();
+// Connect and verify API key
+client.connect()
+  .then(serverInfo => {
+    console.log(`Connected to ${serverInfo.Name}`);
+  })
+  .catch(err => {
+    console.error('Connection failed:', err.message);
+  });
 ```
-## Advanced Usage
-```js
-const ERLCClient = require('erlc-api-client');
+## Features
+- Automatic API key validation
+- Built-in rate limiting
+- Complete endpoint coverage
+- Command validation system
+- TypeScript support
+- Event-driven architecture
 
-// Configure with custom settings
-const client = new ERLCClient(process.env.ERLC_API_KEY, {
-  globalRateDelay: 1500,
-  baseBackoffTime: 3000
-});
-
-// Event listeners for monitoring
-client.on('rateLimit', ({ bucket, retryAfter }) => {
-  console.warn(`Rate limited in ${bucket} bucket. Retrying in ${retryAfter}ms`);
-});
-
-client.on('request', ({ endpoint, method }) => {
-  analytics.trackRequest(method, endpoint);
-});
-
-async function fullServerManagement() {
-  try {
-    // Batch requests
-    const [players, vehicles] = await Promise.all([
-      client.server.getPlayers(),
-      client.server.getVehicles()
-    ]);
-
-    // Command sequence with validation
-    if (players.length > 0) {
-      await client.commands.send(':weather clear');
-      await client.commands.send(':time 12');
-      console.log('Reset environment settings');
-    }
-
-    // Automated player management
-    const bannedPlayers = await client.server.getBans();
-    console.log(`Active bans: ${Object.keys(bannedPlayers).length}`);
-
-  } catch (error) {
-    console.error('Management error:', error);
-  }
-}
-
-fullServerManagement();
-```
 ## API Endpoints
-
-| Endpoint                | Method | Implemented | Example Usage                     |
-|-------------------------|--------|-------------|-----------------------------------|
-| `/server`               | GET    | ✅          | `client.server.getInfo()`         |
-| `/server/players`       | GET    | ✅          | `client.server.getPlayers()`      |
-| `/server/bans`          | GET    | ✅          | `client.server.getBans()`         |
-| `/server/vehicles`      | GET    | ✅          | `client.server.getVehicles()`     |
-| `/server/command`       | POST   | ✅          | `client.commands.send()`          |
-| `/server/joinlogs`      | GET    | ✅          | `client.server.getJoinLogs()`     |
-| `/server/killlogs`      | GET    | ✅          | `client.server.getKillLogs()`     |
-| `/server/commandlogs`   | GET    | ✅          | `client.server.getCommandLogs()`  |
-| `/server/modcalls`      | GET    | ✅          | `client.server.getModCalls()`     |
-| `/server/queue`         | GET    | ✅          | `client.server.getQueue()`        |
-
-## Command Reference
-
-| Command           | Parameters                   | Valid Example                   |
-|-------------------|------------------------------|---------------------------------|
-| `:h`/:hint       | Message                      | `:h Server restarting`         |
-| `:weather`        | [clear/rain/fog/snow]        | `:weather snow`                |
-| `:time`           | 0-24                         | `:time 18`                     |
-| `:jail`/:arrest   | Player                       | `:jail Player123`              |
-| `:ban`            | Player                       | `:ban RuleBreaker456`          |
-| `:heal`           | Player                       | `:heal InjuredPlayer`          |
-| `:admin`          | Player                       | `:admin TrustedUser`           |
-| `:mod`            | Player                       | `:mod ResponsiblePlayer`       |
-| `:wanted`         | Player                       | `:wanted SuspectPlayer`        |
-| `:unjail`         | Player                       | `:unjail ReleasedPlayer`       |
-
+All server endpoints return promises:
 ```js
-// Example command sequence
-async function handleAction() {
-  try {
-    await client.commands.send(':h Defaulting weather and time.');
-    await client.commands.send(':weather clear');
-    await client.commands.send(':time 12');
-    console.log('The weather and time are now at a "default" setting.');
-  } catch (error) {
-    console.error('Failed action sequence:', error.message);
-  }
+// Get server information
+const info = await client.server.getInfo();
+
+// Get online players
+const players = await client.server.getPlayers(); 
+
+// Get ban list
+const bans = await client.server.getBans();
+
+// Full endpoint list:
+// - getQueue()
+// - getJoinLogs() 
+// - getKillLogs()
+// - getCommandLogs()
+// - getModCalls()
+// - getVehicles()
+```
+
+## Command System
+Pre-validated command execution:
+```js
+// Send server message
+await client.commands.send(':h Server shutdown soon');
+
+// Change weather
+await client.commands.send(':weather rain');
+
+// Manage players
+await client.commands.send(':ban RuleBreaker123');
+```
+
+## Supported Commands
+
+| Command               | Parameters                     | Description                          | Example                     |
+|-----------------------|--------------------------------|--------------------------------------|-----------------------------|
+| `:h`, `:hint`        | `<message>`                   | Server-wide hint message             | `:h Server restarting soon` |
+| `:m`, `:message`     | `<message>`                   | Server-wide message                  | `:m Important update`       |
+| `:pm`                | `<player> <message>`          | Private message to player            | `:pm Player1 Hello!`        |
+| `:weather`           | `clear/rain/fog/snow/thunderstorm` | Change weather                  | `:weather snow`             |
+| `:time`              | `0-24`                        | Set time of day (0=midnight)         | `:time 18`                  |
+| `:ban`               | `<player>`                    | Ban player                           | `:ban RuleBreaker`          |
+| `:unban`             | `<player>`                    | Unban player                         | `:unban ReformedPlayer`     |
+| `:jail`, `:arrest`   | `<player>`                    | Jail player                          | `:jail Suspect`             |
+| `:unjail`            | `<player>`                    | Release from jail                    | `:unjail Player`            |
+| `:wanted`            | `<player>`                    | Mark as wanted                       | `:wanted Criminal`          |
+| `:unwanted`          | `<player>`                    | Remove wanted status                 | `:unwanted Player`          |
+| `:admin`             | `<player>`                    | Grant admin                          | `:admin TrustedPlayer`      |
+| `:unadmin`           | `<player>`                    | Revoke admin                         | `:unadmin Player`           |
+| `:mod`               | `<player>`                    | Grant moderator                      | `:mod ResponsiblePlayer`    |
+| `:unmod`             | `<player>`                    | Revoke moderator                     | `:unmod Player`             |
+| `:helper`            | `<player>`                    | Grant helper                         | `:helper NewPlayer`         |
+| `:unhelper`          | `<player>`                    | Revoke helper                        | `:unhelper Player`          |
+| `:kill`              | `<player>`                    | Kill player                          | `:kill Player`              |
+| `:heal`              | `<player>`                    | Heal player                          | `:heal InjuredPlayer`       |
+| `:respawn`           | `<player>`                    | Respawn player                       | `:respawn Player`           |
+| `:load`              | `<player>`                    | Load player character                | `:load Player`              |
+| `:tp`, `:teleport`   | `<player1> <player2>`         | Teleport player to player            | `:tp Player1 Player2`       |
+| `:to`                | -                             | Teleport to admin position           | `:to`                       |
+| `:startfire`         | `house/brush/building`        | Start fire at location               | `:startfire house`          |
+| `:stopfire`          | -                             | Extinguish all fires                 | `:stopfire`                 |
+| `:prty`, `:priority` | `<seconds>`                   | Set priority timer                   | `:prty 300`                 |
+| `:pt`, `:peacetimer` | `<seconds>`                   | Set peace timer                      | `:pt 600`                   |
+
+**Notes:**
+1. All player parameters accept either `PlayerName` or `PlayerName:ID` format
+2. Time accepts 0-24 (where both 0 and 24 represent midnight)
+3. Weather options are case-insensitive
+
+## Error Handling
+```js
+try {
+  await client.commands.send(':invalid-command');
+} catch (err) {
+  console.error(err.message); 
+  // "Invalid command: :invalid-command"
 }
+```
+## TypeScript Support
+```ts
+import ERLCClient from 'erlc-api-client';
+
+const client = new ERLCClient({ API_KEY: 'key' });
+// Full type checking available
 ```
