@@ -1,45 +1,32 @@
-const EventEmitter = require('events');
-
-class RateLimiter extends EventEmitter {
+class RateLimiter {
   constructor(options = {}) {
-    super();
     this.buckets = new Map();
     this.globalDelay = options.globalRateDelay || 1714;
-    this.resetBuffer = options.bucketResetBuffer || 1000;
+    this.lastRequest = 0;
   }
 
   checkLimit(bucket) {
     const now = Date.now();
-    if (!this.buckets.has(bucket)) {
-      this.buckets.set(bucket, {
-        remaining: 1,
-        limit: 35,
-        reset: now + 60000
-      });
-      return 0;
-    }
+    const bucketData = this.buckets.get(bucket) || {
+      remaining: 1,
+      limit: 35,
+      reset: now + 60000
+    };
 
-    const bucketData = this.buckets.get(bucket);
     if (bucketData.remaining <= 0 && now < bucketData.reset) {
-      const waitTime = bucketData.reset - now + this.resetBuffer;
-      this.emit('rateLimit', { bucket, waitTime });
-      return waitTime;
+      return bucketData.reset - now;
     }
-
     return 0;
   }
 
-  update(bucket, headers) {
+  updateLimits(headers, bucket) {
     const newData = {
       remaining: parseInt(headers['x-ratelimit-remaining'],
       limit: parseInt(headers['x-ratelimit-limit']),
       reset: parseInt(headers['x-ratelimit-reset']) * 1000
     };
     this.buckets.set(bucket, newData);
-  }
-
-  getStats() {
-    return Object.fromEntries(this.buckets);
+    this.lastRequest = Date.now();
   }
 }
 
