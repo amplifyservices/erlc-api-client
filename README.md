@@ -112,14 +112,14 @@ fullServerManagement();
 
 ```js
 // Example command sequence
-async function handleEmergency() {
+async function handleAction() {
   try {
-    await client.commands.send(':h EMERGENCY LOCKDOWN');
+    await client.commands.send(':h Defaulting weather and time.');
     await client.commands.send(':weather clear');
     await client.commands.send(':time 12');
-    console.log('Emergency protocols activated');
+    console.log('The weather and time are now at a "default" setting.');
   } catch (error) {
-    console.error('Failed emergency sequence:', error.message);
+    console.error('Failed action sequence:', error.message);
   }
 }
 ```
