@@ -1,7 +1,6 @@
 # ERLC API Client
 
-[![npm version](https://img.shields.io/npm/v/erlc-api-client)](https://www.npmjs.com/package/erlc-api-client)  
-[![License](https://img.shields.io/badge/License-GPL--3.0%20with%20Restrictions-blue)](LICENSE.md)
+[![npm version](https://img.shields.io/npm/v/erlc-api-client)](https://www.npmjs.com/package/erlc-api-client) [![License](https://img.shields.io/badge/License-GPL--3.0%20with%20Restrictions-blue)](LICENSE.md)
 
 **ERLC API Client** is an enterprise-grade Node.js client for the Emergency Response: Liberty City (ER:LC) API. It offers:
 
