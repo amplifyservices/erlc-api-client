@@ -83,7 +83,7 @@ class ERLCClient {
 
       this.connected = true;
       if (this.config.enableLogging) {
-        console.log(`✅ Connected to "${response.data.Name}"`);
+        console.log(`Connected to "${response.data.Name}"`);
       }
       return response.data;
     } catch (error) {
@@ -111,7 +111,7 @@ class ERLCClient {
       }
 
       if (this.config.enableLogging) {
-        console.log(`⚡ ${method} ${endpoint}`);
+        console.log(`${method} ${endpoint}`);
       }
 
       const response = await axios({
@@ -127,7 +127,7 @@ class ERLCClient {
           parseInt(response.headers["x-ratelimit-reset"]) * 1000;
         const waitTime = resetTime - Date.now() + 1000;
         if (this.config.enableLogging) {
-          console.log(`⏳ Rate limited - waiting ${waitTime}ms`);
+          console.log(`Rate limited - waiting ${waitTime}ms`);
         }
         await new Promise((resolve) => setTimeout(resolve, waitTime));
       }
@@ -141,7 +141,7 @@ class ERLCClient {
       return response;
     } catch (error) {
       if (this.config.enableLogging) {
-        console.error(`❌ ${method} ${endpoint} failed:`, error.message);
+        console.error(`${method} ${endpoint} failed:`, error.message);
       }
       throw error;
     } finally {

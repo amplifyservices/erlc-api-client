@@ -65,7 +65,7 @@ class RateLimiter {
 
   async _wait(ms) {
     if (this.config.enableLogging) {
-      console.log(`⏳ Waiting ${ms}ms to respect rate limits`);
+      console.log(`Waiting ${ms}ms to respect rate limits`);
     }
     await new Promise((resolve) => setTimeout(resolve, ms));
   }
