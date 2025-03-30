@@ -6,7 +6,7 @@
   "types": "types/index.d.ts",
   "repository": {
     "type": "git",
-    "url": "https://github.com/amplifysolutions/erlc-api-client.git"
+    "url": "git+https://github.com/amplifysolutions/erlc-api-client.git"
   },
   "author": "OfficialSteam",
   "license": "Custom-GPL-3.0",
