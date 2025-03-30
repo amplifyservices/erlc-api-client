@@ -1,12 +1,12 @@
 {
   "name": "erlc-api-client",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A client for interacting with the PRC API.",
   "main": "src/core/Client.js",
   "types": "types/index.d.ts",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/amplifysolutions/erlc-api-client.git"
+    "url": "git+https://github.com/amplifyservices/erlc-api-client.git"
   },
   "author": "OfficialSteam",
   "license": "Custom-GPL-3.0",
@@ -17,13 +17,13 @@
     },
     {
       "type": "Custom",
-      "url": "https://github.com/amplifysolutions/erlc-api-client/blob/main/LICENSE.md"
+      "url": "https://github.com/amplifyservices/erlc-api-client/blob/main/LICENSE.md"
     }
   ],
   "bugs": {
-    "url": "https://github.com/amplifysolutions/erlc-api-client/issues"
+    "url": "https://github.com/amplifyservices/erlc-api-client/issues"
   },
-  "homepage": "https://github.com/amplifysolutions/erlc-api-client#readme",
+  "homepage": "https://github.com/amplifyservices/erlc-api-client#readme",
   "scripts": {
     "test": "jest",
     "start": "node examples/basic.js"
